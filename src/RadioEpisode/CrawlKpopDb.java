@@ -146,7 +146,7 @@ public class CrawlKpopDb {
 		return toReturn;
 	}
 	
-	public void crawlSongs(String artistUrl) {
+	private void crawlSongs(String artistUrl) {
 		Document doc = null;
 		String artist = artistUrl.substring(artistUrl.indexOf("name_kor=") + 9);
 		try {
