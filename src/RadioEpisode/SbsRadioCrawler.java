@@ -43,6 +43,7 @@ public class SbsRadioCrawler {
 				writeToFile(title.text().trim(), requestDate.text().trim(), author.text().trim(), content.text().trim(),
 							prevId.substring(3).trim(), program);
 			} catch(Exception e) {
+				e.printStackTrace();
 				BufferedWriter writer = null;
 				File errLog = new File(OUTPATH + "errLog.txt");
 				try {
@@ -101,9 +102,9 @@ public class SbsRadioCrawler {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		SbsRadioCrawler dao = new SbsRadioCrawler();
-		String[] programs = {"sbs12pm", "sbs2pm", "sbs4pm", "sbs6pm", "sbs8pm", "sbs10pm", "sbs12am"};
-		String[] programIds = {"powertime1", "cult16", "school01", "lovegame03", "Boom2ayo5", "greatradio15", "todaynight07"};
-		String[] startIdx = {"no=108759", "no=1", "no=1", "no=1", "no=1", "no=1", "no=1"};
+		String[] programs = {"sbs4pm", "sbs6pm", "sbs8pm", "sbs10pm", "sbs12am"}; //"sbs12pm", "sbs2pm", 
+		String[] programIds = {"school01", "lovegame03", "Boom2ayo5", "greatradio15", "todaynight07"}; //"powertime1", "cult16", 
+		String[] startIdx = {"no=1", "no=1", "no=1", "no=1", "no=1"}; //"no=108759", "no=1", 
 		
 		for(int i = 0; i < programs.length; i++) {
 			System.out.println("Currently crawling program: " + programs[i]);
