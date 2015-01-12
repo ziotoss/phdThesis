@@ -1,4 +1,4 @@
-package RadioEpisode;
+package DataTypes;
 
 public class WordDictObject {
 

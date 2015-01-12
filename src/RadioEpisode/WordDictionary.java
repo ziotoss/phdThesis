@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import DataTypes.WordDictObject;
+
 public class WordDictionary {
 
 	/**
@@ -70,6 +72,7 @@ public class WordDictionary {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void validateWordCount(String program) {
 		String prefix = "sbs";
 		String postfix = "_201407_hts";
@@ -156,6 +159,7 @@ public class WordDictionary {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void validateDocCount(String program) {
 		int[] docCount = new int[dicWords.size()];
 		for(int i = 0; i < docCount.length; i++)

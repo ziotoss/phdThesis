@@ -26,7 +26,6 @@ public class SbsRadioCrawler {
 				Element requestDate = doc.getElementsByAttributeValue("headers", "con_date").first();
 				Element author = doc.getElementsByAttributeValue("headers", "con_writer").first();
 				Element content = doc.getElementsByAttributeValue("id", "content").first();
-				
 				Element topBar = doc.getElementsByClass("fl").first();
 				Elements topBarElems = topBar.getElementsByAttribute("href");
 	
@@ -39,8 +38,13 @@ public class SbsRadioCrawler {
 						prevId = "DONE";
 					}
 				}
+		
+				String contentStr = content.html();
+				contentStr = contentStr.replace("<p>", "").replace("</p>", "").replace("&nbsp;", "")
+						.replaceAll("[<][s][c][r][i][p][t][>](.*?)[<][/][s][c][r][i][p][t][>]", "")
+						.replaceAll("[<][i][m][g](.*?)[/][>]", "");
 				
-				writeToFile(title.text().trim(), requestDate.text().trim(), author.text().trim(), content.text().trim(),
+				writeToFile(title.text().trim(), requestDate.text().trim(), author.text().trim(), contentStr.trim(),
 							prevId.substring(3).trim(), program);
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -111,5 +115,4 @@ public class SbsRadioCrawler {
 			dao.crawlEpisodes(programs[i], programIds[i], startIdx[i]);
 		}
 	}
-
 }

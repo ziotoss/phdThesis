@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import DataTypes.WordDictObject;
+
 public class CombineDictionary {
 
 	private final String INDIVIDUALDICTPATH = "C:/Users/user/Documents/Thesis_Workspace/PhdThesis/";
@@ -34,6 +36,8 @@ public class CombineDictionary {
 					dictionary.add(existingWdo);
 				}
 			}
+			
+			scanner.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
