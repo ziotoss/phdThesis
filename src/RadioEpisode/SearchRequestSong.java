@@ -36,7 +36,7 @@ public class SearchRequestSong {
 	private ArrayList<SongObject> retrieveSongInfo() {
 		ArrayList<SongObject> songInfo = new ArrayList<SongObject>();
 		try {
-			PreparedStatement select = kpopConnect.prepareStatement("SELECT * FROM kpop_archive LIMIT 0, 10000");
+			PreparedStatement select = kpopConnect.prepareStatement("SELECT * FROM kpop_archive LIMIT 0, 30000");
 			ResultSet rs = select.executeQuery();
 			
 			while(rs.next()) {
@@ -72,16 +72,17 @@ public class SearchRequestSong {
 			System.out.println("Processing artist = " + rtObj.getArtist() + " title = " + rtObj.getTitle());
 			String artist = rtObj.getArtist();
 			String title = rtObj.getTitle();
-			ArrayList<String> requestedEpisodes = searchRequestSongs(rtObj.getArtist(), rtObj.getTitle());
-
-			if(requestedEpisodes.size() > 0)
+			if(!processedSong(artist, title)) {
+				ArrayList<String> requestedEpisodes = searchRequestSongs(rtObj.getArtist(), rtObj.getTitle());
 				writeToFile(artist, title, requestedEpisodes);
+			} else
+				System.out.println("Already processed.");
 		}
 	}
 	
 	private ArrayList<String> searchRequestSongs(String artist, String title) {
 		ArrayList<String> toReturn = new ArrayList<String>();
-		String[] programs = {"sbs8pm_201412"};
+		String[] programs = {"sbs12pm_201412", "sbs2pm_201412", "sbs4pm_201412", "sbs6pm_201412", "sbs8pm_201412", "sbs10pm_201412", "sbs12am_201412"};
 		
 		for(String program : programs) {
 
@@ -118,9 +119,9 @@ public class SearchRequestSong {
 								}
 							}
 						}
-						
-						scanner.close();	
-					}
+					}					
+					
+					scanner.close();	
 				} catch(IOException e) {
 					e.printStackTrace();
 				}
@@ -128,6 +129,11 @@ public class SearchRequestSong {
 		}
 		
 		return toReturn;
+	}
+	
+	private boolean processedSong(String artist, String title) {
+		File outFile = new File(OUTPUTPATH + artist + "_" + title + ".txt");
+		return outFile.exists();
 	}
 	
 	private void writeToFile(String artist, String title, ArrayList<String> requestedEpisodes) {
