@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import DataTypes.EpisodeObject;
 import DataTypes.SongObject;
 
 
@@ -34,6 +35,7 @@ public class SearchRequestSong {
 	}
 
 	private ArrayList<SongObject> retrieveSongInfo() {
+		System.out.println("Retrieving song info from Db.");
 		ArrayList<SongObject> songInfo = new ArrayList<SongObject>();
 		try {
 			PreparedStatement select = kpopConnect.prepareStatement("SELECT * FROM kpop_archive LIMIT 0, 30000");
@@ -68,62 +70,83 @@ public class SearchRequestSong {
 
 	private void retrieveRequestSong(ArrayList<SongObject> songObj) {
 
+		ArrayList<EpisodeObject> epiList = retrieveEpisodeInfo();
+		
 		for(SongObject rtObj : songObj) {
 			System.out.println("Processing artist = " + rtObj.getArtist() + " title = " + rtObj.getTitle());
 			String artist = rtObj.getArtist();
 			String title = rtObj.getTitle();
 			if(!processedSong(artist, title)) {
-				ArrayList<String> requestedEpisodes = searchRequestSongs(rtObj.getArtist(), rtObj.getTitle());
+				ArrayList<String> requestedEpisodes = searchRequestSongs(rtObj.getArtist(), rtObj.getTitle(), epiList);
 				writeToFile(artist, title, requestedEpisodes);
 			} else
 				System.out.println("Already processed.");
 		}
 	}
 	
-	private ArrayList<String> searchRequestSongs(String artist, String title) {
-		ArrayList<String> toReturn = new ArrayList<String>();
+	private ArrayList<EpisodeObject> retrieveEpisodeInfo() {
+		System.out.println("Storing episodes into arraylist.");
 		String[] programs = {"sbs12pm_201412", "sbs2pm_201412", "sbs4pm_201412", "sbs6pm_201412", "sbs8pm_201412", "sbs10pm_201412", "sbs12am_201412"};
+		ArrayList<EpisodeObject> epiObjList = new ArrayList<EpisodeObject>();
 		
 		for(String program : programs) {
 
 			File root = new File(DATAPATH + program);
 			
 			for(File f : root.listFiles()) {
-	
+				EpisodeObject epiObj = new EpisodeObject();
+				epiObj.setEpisodeId(f.getAbsolutePath());
+				
 				try {
 					Scanner scanner = new Scanner(new FileReader(f));
-					ArrayList<String> artistNames = new ArrayList<String>();
-					if(artist.contains("(")) {
-						artistNames.add(artist.substring(0, artist.indexOf("(")));
-						artistNames.add(artist.substring(artist.indexOf("(") + 1, artist.indexOf(")")));
-					} else {
-						artistNames.add(artist);
+					ArrayList<String> sentences = new ArrayList<String>();
+
+					while(scanner.hasNext()) {
+						sentences.add(scanner.nextLine().trim());
 					}
-					
-					for(String name : artistNames) {
-						
-						while(scanner.hasNext()) {
-							String line = scanner.nextLine();
-							if(title.length() < 2) {
-								if(line.toLowerCase().replaceAll("\\p{Punct}", "").replaceAll(" ", "").contains(title) 
-										&& line.toLowerCase().contains(name)
-										&& (line.contains("신청") || line.contains("듣고") || line.contains("틀어") || line.contains("들려"))) {
-									if(!toReturn.contains(f.getAbsolutePath()))
-										toReturn.add(f.getAbsolutePath());
-								}
-							} else {
-								if(line.toLowerCase().replaceAll("\\p{Punct}", "").replaceAll(" ", "").contains(title)
-										&& line.toLowerCase().contains(name)) {
-									if(!toReturn.contains(f.getAbsolutePath()))
-										toReturn.add(f.getAbsolutePath());
-								}
-							}
-						}
-					}					
-					
-					scanner.close();	
+					scanner.close();
+					epiObj.setSentences(sentences);
+					epiObjList.add(epiObj);
 				} catch(IOException e) {
 					e.printStackTrace();
+				}
+			}
+		}
+		
+		return epiObjList;
+	}
+	
+	private ArrayList<String> searchRequestSongs(String artist, String title, ArrayList<EpisodeObject> epiList) {
+		ArrayList<String> toReturn = new ArrayList<String>();
+		ArrayList<String> artistNames = new ArrayList<String>();
+
+		if(artist.contains("(")) {
+			artistNames.add(artist.substring(0, artist.indexOf("(")));
+			artistNames.add(artist.substring(artist.indexOf("(") + 1, artist.indexOf(")")));
+		} else {
+			artistNames.add(artist);
+		}
+
+		for(EpisodeObject epiObj : epiList) {
+			String epiId = epiObj.getEpisodeId();
+			ArrayList<String> sentences = epiObj.getSentences();
+			for(String name : artistNames) {
+				
+				for(String s : sentences) {
+					if(title.length() < 2) {
+						if(s.toLowerCase().replaceAll("\\p{Punct}", "").replaceAll(" ", "").contains(title) 
+								&& s.toLowerCase().contains(name)
+								&& (s.contains("신청") || s.contains("듣고") || s.contains("틀어") || s.contains("들려"))) {
+							if(!toReturn.contains(epiId))
+								toReturn.add(epiId);
+						}
+					} else {
+						if(s.toLowerCase().replaceAll("\\p{Punct}", "").replaceAll(" ", "").contains(title)
+								&& s.toLowerCase().contains(name)) {
+							if(!toReturn.contains(epiId))
+								toReturn.add(epiId);
+						}
+					}
 				}
 			}
 		}
