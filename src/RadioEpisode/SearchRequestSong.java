@@ -19,7 +19,7 @@ import DataTypes.SongObject;
 public class SearchRequestSong {
 
 	private final static String DATAPATH = "D:/Data/RadioEpisode/";
-	private final String OUTPUTPATH = DATAPATH + "sbs_request_songs/";
+	private final String OUTPUTPATH = DATAPATH + "sbs_request_songs2/";
 	private Connection kpopConnect = null;
 	
 	private void connectToDb() {
@@ -74,8 +74,8 @@ public class SearchRequestSong {
 		
 		for(SongObject rtObj : songObj) {
 			System.out.println("Processing artist = " + rtObj.getArtist() + " title = " + rtObj.getTitle());
-			String artist = rtObj.getArtist();
-			String title = rtObj.getTitle();
+			String artist = rtObj.getArtist().toLowerCase().replaceAll(" ", "").replaceAll("\\p{Punct}", "").trim();
+			String title = rtObj.getTitle().toLowerCase().replaceAll(" ", "").replaceAll("\\p{Punct}", "").trim();
 			if(!processedSong(artist, title)) {
 				ArrayList<String> requestedEpisodes = searchRequestSongs(rtObj.getArtist(), rtObj.getTitle(), epiList);
 				writeToFile(artist, title, requestedEpisodes);
@@ -102,7 +102,9 @@ public class SearchRequestSong {
 					ArrayList<String> sentences = new ArrayList<String>();
 
 					while(scanner.hasNext()) {
-						sentences.add(scanner.nextLine().trim());
+						String line = scanner.nextLine().trim();
+						if(!line.equals(""))
+							sentences.add(line);
 					}
 					scanner.close();
 					epiObj.setSentences(sentences);
@@ -120,9 +122,12 @@ public class SearchRequestSong {
 		ArrayList<String> toReturn = new ArrayList<String>();
 		ArrayList<String> artistNames = new ArrayList<String>();
 
-		if(artist.contains("(")) {
+		if(artist.contains("(") && artist.contains(")")) {
 			artistNames.add(artist.substring(0, artist.indexOf("(")));
 			artistNames.add(artist.substring(artist.indexOf("(") + 1, artist.indexOf(")")));
+		} else if(artist.contains("(") && !artist.contains(")")){
+			artistNames.add(artist.substring(0, artist.indexOf("(")));
+			artistNames.add(artist.substring(artist.indexOf("(") + 1));
 		} else {
 			artistNames.add(artist);
 		}
@@ -131,18 +136,37 @@ public class SearchRequestSong {
 			String epiId = epiObj.getEpisodeId();
 			ArrayList<String> sentences = epiObj.getSentences();
 			for(String name : artistNames) {
+				String nameTmp = name.toLowerCase().replaceAll(" ", "").replaceAll("\\p{Punct}", "").trim();
 				
 				for(String s : sentences) {
+					String sentenceTmp = s.toLowerCase().replaceAll(" ", "").replaceAll("\\p{Punct}", "").trim();
 					if(title.length() < 2) {
-						if(s.toLowerCase().replaceAll("\\p{Punct}", "").replaceAll(" ", "").contains(title) 
-								&& s.toLowerCase().contains(name)
-								&& (s.contains("신청") || s.contains("듣고") || s.contains("틀어") || s.contains("들려"))) {
+						/*if(sentenceTmp.contains(title) && sentenceTmp.contains(nameTmp)
+								&& (sentenceTmp.contains("신청") || sentenceTmp.contains("듣고") || sentenceTmp.contains("틀어") || sentenceTmp.contains("들려"))) {
+							if(!toReturn.contains(epiId))
+								toReturn.add(epiId);
+						}*/
+						if(sentenceTmp.matches(".*" + nameTmp + ".*" + title + ".*")
+								&& (sentenceTmp.contains("듣고") || sentenceTmp.contains("신청") || sentenceTmp.contains("틀어") || sentenceTmp.contains("들려"))) {
 							if(!toReturn.contains(epiId))
 								toReturn.add(epiId);
 						}
+
+						else if(sentenceTmp.matches(".*" + title + ".*" + nameTmp + ".*")
+								&& (sentenceTmp.contains("듣고") || sentenceTmp.contains("신청") || sentenceTmp.contains("틀어") || sentenceTmp.contains("들려"))) {
+							if(!toReturn.contains(epiId))
+								toReturn.add(epiId);
+						}
+								
 					} else {
-						if(s.toLowerCase().replaceAll("\\p{Punct}", "").replaceAll(" ", "").contains(title)
-								&& s.toLowerCase().contains(name)) {
+						/*if(sentenceTmp.contains(title) && s.toLowerCase().contains(nameTmp)) {
+							if(!toReturn.contains(epiId))
+								toReturn.add(epiId);
+						}*/
+						if(sentenceTmp.matches(".*" + nameTmp + ".*" + title + ".*")) {
+							if(!toReturn.contains(epiId))
+								toReturn.add(epiId);
+						} else if(sentenceTmp.matches(".*" + title + ".*" + nameTmp + ".*")) {
 							if(!toReturn.contains(epiId))
 								toReturn.add(epiId);
 						}
@@ -173,7 +197,7 @@ public class SearchRequestSong {
 			}
 		}
 		
-		File outFile = new File(outDir.getAbsolutePath() + "/" + artist + "_" + title + ".txt");
+		File outFile = new File(outDir.getAbsolutePath() + "/" + artist + "_" + title.replaceAll("\\p{Punct}", "").trim() + ".txt");
 		String NL = System.getProperty("line.separator");
 		try {
 			writer = new BufferedWriter(new FileWriter(outFile));
