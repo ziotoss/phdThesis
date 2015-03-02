@@ -48,3 +48,4 @@ Temporary Items
 # Other system dependent files
 *.class
 .classpath
+bin
