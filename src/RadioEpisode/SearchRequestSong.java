@@ -18,8 +18,8 @@ import DataTypes.SongObject;
 
 public class SearchRequestSong {
 
-	private final static String DATAPATH = "D:/Data/RadioEpisode/";
-	private final String OUTPUTPATH = DATAPATH + "sbs_request_songs2/";
+	private final static String DATAPATH = "D:/Data/RadioEpisode/sbs_201412_ori/";
+	private final String OUTPUTPATH = "D:/Data/RadioEpisode/sbs_request_songs2/";
 	private Connection kpopConnect = null;
 	
 	private void connectToDb() {
@@ -38,7 +38,7 @@ public class SearchRequestSong {
 		System.out.println("Retrieving song info from Db.");
 		ArrayList<SongObject> songInfo = new ArrayList<SongObject>();
 		try {
-			PreparedStatement select = kpopConnect.prepareStatement("SELECT * FROM kpop_archive LIMIT 0, 30000");
+			PreparedStatement select = kpopConnect.prepareStatement("SELECT * FROM kpop_archive LIMIT 120000, 10000");
 			ResultSet rs = select.executeQuery();
 			
 			while(rs.next()) {
