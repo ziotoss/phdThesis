@@ -18,7 +18,7 @@ import DataTypes.SongObject;
 
 public class SearchRequestSong {
 
-	private final static String DATAPATH = "D:/Data/RadioEpisode/sbs_201412_ori/";
+	private final static String DATAPATH = "D:/Data/RadioEpisode/";
 	private final String OUTPUTPATH = "D:/Data/RadioEpisode/sbs_request_songs2/";
 	private Connection kpopConnect = null;
 	
