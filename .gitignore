@@ -44,3 +44,7 @@ Temporary Items
 
 # Text files
 *.txt
+
+# Other system dependent files
+*.class
+.classpath
