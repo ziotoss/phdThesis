@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import DataTypes.EpisodeObject;
@@ -104,7 +105,7 @@ class SearchRequestSongThread extends Thread {
 
 		for(EpisodeObject epiObj : epiList) {
 			String epiId = epiObj.getEpisodeId();
-			ArrayList<String> sentences = epiObj.getSentences();
+			List<String> sentences = epiObj.getSentences();
 			for(String name : artistNames) {
 				String nameTmp = name.toLowerCase().replaceAll(" ", "").replaceAll("\\p{Punct}", "").trim();
 				

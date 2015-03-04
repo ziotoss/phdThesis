@@ -1,11 +1,11 @@
 package DataTypes;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class EpisodeObject {
 	
 	private String episodeId;
-	private ArrayList<String> sentences;
+	private List<String> sentences;
 	
 	
 	public String getEpisodeId() {
@@ -18,12 +18,12 @@ public class EpisodeObject {
 	}
 	
 	
-	public ArrayList<String> getSentences() {
+	public List<String> getSentences() {
 		return sentences;
 	}
 	
 	
-	public void setSentences(ArrayList<String> sentences) {
+	public void setSentences(List<String> sentences) {
 		this.sentences = sentences;
 	}
 	
